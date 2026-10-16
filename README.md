@@ -55,7 +55,9 @@ The resulting dataset was uploaded to the Algolia primary index `restaurants_mer
 
 **Filtering:** Algolia facets for city and price, alongside numeric filters for minimum star ratings. Other available facets include cuisine, neighbourhood and dining style.
 
-**Ranking:** Default textual relevance followed by descending star ratings and review counts.
+**Ranking:** Algolia's textual relevance criteria are followed by a confidence-adjusted `weighted_rating` and review count. The weighted rating combines each restaurant's average rating, review volume, and the dataset average (4.29 stars), using a 100-review smoothing factor. This avoids over-promoting restaurants with very few reviews.
+
+**Sorting replicas:** `restaurants_price_asc` sorts by price ascending, while `restaurants_rating_desc` sorts by raw star rating descending.
 
 **Sorting replicas:**
 
