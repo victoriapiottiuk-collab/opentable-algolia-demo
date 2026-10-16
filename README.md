@@ -1,16 +1,115 @@
-# React + Vite
+# OpenTable Reimagined — Algolia Restaurant Discovery
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+An unofficial restaurant discovery prototype developed for an Algolia Solutions Engineer technical assessment.
 
-Currently, two official plugins are available:
+**Live demo:** https://opentable-algolia-demo-five.vercel.app/
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+**Source code:** https://github.com/victoriapiottiuk-collab/opentable-algolia-demo
 
-## React Compiler
+## Overview
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+This application demonstrates how Algolia can power fast, relevant restaurant discovery for two types of users:
 
-## Expanding the ESLint configuration
+- **Known-item search:** Finding a particular restaurant by name, including partial matches and misspellings.
+- **Exploratory discovery:** Finding restaurants through cuisine, location, price, ratings and sorting.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+The application searches a dataset of 5,000 restaurants and provides a responsive React interface.
+
+## Features
+
+- Instant, typo-tolerant restaurant search
+- Cuisine-related synonyms configured in Algolia
+- City, price and minimum-rating filters
+- Sorting by recommended results, price ascending and highest rating
+- Paginated results with 12 restaurants per page
+- Restaurant ratings, review counts and price information
+- Links to the provided OpenTable reservation pages
+- Display of Algolia search processing time
+
+## Tech Stack
+
+- **Frontend:** React, Vite, JavaScript and CSS
+- **Search:** Algolia Search API
+- **Hosting:** Vercel
+- **Version control:** GitHub
+
+## Data Preparation
+
+Two source datasets were merged using `objectID`:
+
+- `restaurants_list.json` — restaurant names, locations, addresses, price categories and geographical coordinates.
+- `restaurants_info.csv` — cuisine, ratings, review counts, dining styles and price ranges.
+
+The merge produced 5,000 records, with checks for matching identifiers and duplicate records.
+
+The resulting dataset was uploaded to the Algolia primary index `restaurants_merged`.
+
+## Algolia Configuration
+
+**Searchable attributes**, ordered by priority:
+
+1. `name`
+2. `food_type`
+3. `city`
+4. `neighborhood`
+
+**Filtering:** Algolia facets for city and price, alongside numeric filters for minimum star ratings. Other available facets include cuisine, neighbourhood and dining style.
+
+**Ranking:** Default textual relevance followed by descending star ratings and review counts.
+
+**Sorting replicas:**
+
+- `restaurants_merged` — Recommended
+- `restaurants_price_asc` — Price: Low to High
+- `restaurants_rating_desc` — Highest Rated
+
+Typo tolerance, cuisine synonyms and price-related Query Rules were configured in Algolia. Geographic search is supported by the indexed `_geoloc` coordinates, although it is not exposed in the current frontend.
+
+## Relevance and Performance
+
+Testing covered exact restaurant names, partial searches, typos, cuisine searches, price intent, combined filters and geographic search.
+
+Initial Algolia processing-time observations:
+
+| Search | Processing time |
+|---|---|
+| Italian | 8 ms |
+| cheap Italian | 11 ms |
+
+These are individual search-processing measurements, not end-to-end website latency benchmarks.
+
+The frontend uses a 250 ms debounce to limit unnecessary requests during typing.
+
+## Running Locally
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Create a `.env.local` file containing:
+
+```env
+VITE_ALGOLIA_APP_ID=your_app_id
+VITE_ALGOLIA_SEARCH_KEY=your_search_only_key
+VITE_ALGOLIA_INDEX=restaurants_merged
+```
+
+Start the development server:
+
+```bash
+npm run dev
+```
+
+Only a restricted search-only API key should be used in the frontend.
+
+## Limitations and Future Improvements
+
+This demonstration focuses on restaurant discovery rather than booking. Real-time table availability is not included in the dataset, and reservation links open OpenTable externally.
+
+Potential improvements include confidence-adjusted restaurant ratings, map-based discovery, more advanced cuisine filtering and improved imagery.
+
+## Disclaimer
+
+This is an independent technical assessment prototype and is not affiliated with or endorsed by OpenTable.
